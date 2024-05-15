@@ -1,0 +1,89 @@
+services:
+  react-app:
+    platform: linux/amd64
+    container_name: react-app-container
+    image: araffler/front-rinha-backend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./src:/app/src
+    environment:
+      - NODE_ENV=production
+    stdin_open: true
+    tty: true
+
+  api01:
+    platform: linux/amd64
+    image: araffler/teste-rinha-backend
+    #build:
+    #  context: ./
+    #  dockerfile: ./Dockerfile
+    hostname: api01
+    env_file:
+      - .env
+    environment:
+      - DB_HOSTNAME=db
+    depends_on:
+      - db
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "190MB"
+
+  api02:
+    platform: linux/amd64
+    image: araffler/teste-rinha-backend
+    #build:
+    #  context: ./
+    #  dockerfile: ./Dockerfile
+    hostname: api02
+    env_file:
+      - .env
+    environment:
+      - DB_HOSTNAME=db
+    depends_on:
+      - db
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "190MB"
+
+  nginx:
+    platform: linux/amd64
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - api01
+      - api02
+    ports:
+      - "9999:9999"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: "30MB"
+
+  db:
+    platform: linux/amd64
+    image: postgres:latest
+    hostname: db
+    environment:
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=rinhabackend-java
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./script.sql:/docker-entrypoint-initdb.d/script.sql
+    deploy:
+      resources:
+        limits:
+          cpus: "0.4"
+          memory: "140MB"
+
+networks:
+  rinha-nginx-2024q1:
+    driver: bridge
