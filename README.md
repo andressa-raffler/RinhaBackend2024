@@ -1,4 +1,4 @@
-# Desafio técnico Softplan - Full Stack - Gestão Pública - Ambiental - 2024
+# RINHA BACKEND 2024 JAVA
 
 ## Setup do projeto
 
